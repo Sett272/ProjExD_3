@@ -2,6 +2,7 @@ import os
 import random
 import sys
 import time
+from turtle import Screen
 import pygame as pg
 
 
@@ -98,7 +99,7 @@ class Beam:
         self.rct = self.img.get_rect()
         self.rct.centery = bird.rct.centery  # ビームの中心縦座標 = こうかとんの中心縦座標
         self.rct.left = bird.rct.right  # ビームの左座標 = こうかとんの右座標
-        self.vx, self.vy = +5, 0
+        self.vx, self.vy = +10, 0
 
     def update(self, screen: pg.Surface):
         """
@@ -125,7 +126,7 @@ class Bomb:
         self.img.set_colorkey((0, 0, 0))
         self.rct = self.img.get_rect()
         self.rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
-        self.vx, self.vy = +5, +5
+        self.vx, self.vy = +3, +3
 
     def update(self, screen: pg.Surface):
         """
@@ -140,22 +141,43 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
+class Score:
+    """
+    打ち落とした爆弾の数をスコアとして表示するクラス
+    """
+    def __init__(self):
+        """
+        スコア表示用の設定と初期化を行う
+        """
+        self.fonto = pg.font.Font(None, 50)   # フォントの設定
+        self.color = (0, 0, 255)              # 文字色の設定（青）
+        self.score = 0                        # スコアの初期値
+        # 文字列Surfaceの生成
+        self.img = self.fonto.render(f"Score: {self.score}", 0, self.color)
+        self.rct = self.img.get_rect()
+        # 文字列の中心座標を画面左下に設定
+        self.rct.center = (100, HEIGHT - 50)
+
+    def update(self, screen: pg.Surface, score_value: int):
+        """
+        現在のスコアを更新して画面に描画する
+        """
+        self.score = score_value
+        self.img = self.fonto.render(f"Score: {self.score}", 0, self.color)
+        screen.blit(self.img, self.rct)
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
-    # bomb = Bomb((255, 0, 0), 10)
-    # bombs = []
-    # for _ in range(NUM_OF_BOMBS):
-    #     bomb = Bomb((255, 0, 0), 10)
-    #     bombs.append(bomb)
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
 
     beam = None  # ゲーム初期化時にはビームは存在しない
     clock = pg.time.Clock()
     tmr = 0
+    score_count = 0
+    score_display = Score()
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -183,14 +205,17 @@ def main():
                     pg.display.update()
                     beam = None
                     bombs[i] = None
+                    score_count += 1
         bombs = [bomb for bomb in bombs if bomb is not None]
 
+        score_value = score_count
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         if beam is not None:  # beamが出現していたら
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
+        score_display.update(screen, score_value)
         pg.display.update()
         tmr += 1
         clock.tick(50)
