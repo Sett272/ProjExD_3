@@ -214,21 +214,13 @@ def main():
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
 
-<<<<<<< HEAD
-    beam = None  # ゲーム初期化時にはビームは存在しない
+    # [初期化] Beamを複数扱うための空リストを作成
+    beams = []
     explosions: list[Explosion] = []
     clock = pg.time.Clock()
     tmr = 0
     score_count = 0
     score_display = Score()
-=======
-    # [初期化] Beamを複数扱うための空リストを作成
-    beams = [] 
-    clock = pg.time.Clock()
-    tmr = 0
-    score = Score()
-
->>>>>>> multibeam
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -258,20 +250,13 @@ def main():
                 if beam.rct.colliderect(bomb.rct):
                     bird.change_img(6, screen)
                     pg.display.update()
-<<<<<<< HEAD
                     explosions.append(Explosion(bomb.rct.center))
-                    beam = None
-                    bombs[i] = None
-                    score_count += 1
-=======
-                    # 衝突した要素はNoneとする
                     bombs[i] = None
                     beams[j] = None
-                    score.score = min(score.score + 1, NUM_OF_BOMBS)
+                    score_count += 1
                     break
 
         # [ループ] 要素がNoneでないものだけのリストに更新
->>>>>>> multibeam
         bombs = [bomb for bomb in bombs if bomb is not None]
         beams = [beam for beam in beams if beam is not None]
 
@@ -288,15 +273,9 @@ def main():
 
         for bomb in bombs:
             bomb.update(screen)
-<<<<<<< HEAD
         score_display.update(screen, score_value)
 
         explosions = [exp for exp in explosions if exp.update(screen)]
-=======
-            
-        score.update(screen)
-        
->>>>>>> multibeam
         pg.display.update()
         tmr += 1
         clock.tick(50)
