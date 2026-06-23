@@ -1,3 +1,4 @@
+import math
 import os
 import random
 import sys
@@ -57,6 +58,7 @@ class Bird:
         self.img = __class__.imgs[(+5, 0)]
         self.rct: pg.Rect = self.img.get_rect()
         self.rct.center = xy
+        self.dire = (+5, 0)
 
     def change_img(self, num: int, screen: pg.Surface):
         """
@@ -83,6 +85,7 @@ class Bird:
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
         if not (sum_mv[0] == 0 and sum_mv[1] == 0):
             self.img = __class__.imgs[tuple(sum_mv)]
+            self.dire = tuple(sum_mv)
         screen.blit(self.img, self.rct)
 
 
@@ -91,15 +94,15 @@ class Beam:
     こうかとんが放つビームに関するクラス
     """
     def __init__(self, bird:"Bird"):
-        """
-        ビーム画像Surfaceを生成する
-        引数 bird：ビームを放つこうかとん（Birdインスタンス）
-        """
-        self.img = pg.image.load(f"fig/beam.png")
+        self.vx, self.vy = bird.dire 
+        
+        angle = math.degrees(math.atan2(-self.vy, self.vx))
+        self.img = pg.transform.rotozoom(pg.image.load(f"fig/beam.png"), angle, 1.0)
+        
         self.rct = self.img.get_rect()
-        self.rct.centery = bird.rct.centery  # ビームの中心縦座標 = こうかとんの中心縦座標
-        self.rct.left = bird.rct.right  # ビームの左座標 = こうかとんの右座標
-        self.vx, self.vy = +10, 0
+        
+        self.rct.centerx = bird.rct.centerx + int(bird.rct.width * self.vx / 5)
+        self.rct.centery = bird.rct.centery + int(bird.rct.height * self.vy / 5)
 
     def update(self, screen: pg.Surface):
         """
@@ -141,7 +144,6 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
-<<<<<<< HEAD
 class Score:
     """
     打ち落とした爆弾の数をスコアとして表示するクラス
@@ -166,7 +168,7 @@ class Score:
         self.score = score_value
         self.img = self.fonto.render(f"Score: {self.score}", 0, self.color)
         screen.blit(self.img, self.rct)
-=======
+
 class Explosion:
     """
     爆発エフェクトに関するクラス
@@ -190,7 +192,6 @@ class Explosion:
             return True
         return False
 
->>>>>>> explosion
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -243,12 +244,9 @@ def main():
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
-<<<<<<< HEAD   
         score_display.update(screen, score_value)
-=======
 
         explosions = [exp for exp in explosions if exp.update(screen)]
->>>>>>> explosion
         pg.display.update()
         tmr += 1
         clock.tick(50)
