@@ -243,7 +243,7 @@ def main():
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
-<<<<<<< HEAD
+<<<<<<< HEAD   
         score_display.update(screen, score_value)
 =======
 
