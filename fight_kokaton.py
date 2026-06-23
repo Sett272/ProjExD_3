@@ -10,7 +10,6 @@ HEIGHT = 650  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 5  # 爆弾の数
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-
 def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内or画面外を判定し，真理値タプルを返す関数
@@ -86,7 +85,6 @@ class Bird:
             self.dire = tuple(sum_mv)  # 移動した方向に向きを更新
         screen.blit(self.img, self.rct)
 
-
 class Beam:
     """
     こうかとんが放つビームに関するクラス
@@ -116,7 +114,6 @@ class Beam:
         if check_bound(self.rct) == (True, True):
             self.rct.move_ip(self.vx, self.vy)
             screen.blit(self.img, self.rct)    
-
 
 class Bomb:
     """
@@ -148,7 +145,6 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
-
 class Explosion:
     """
     爆発エフェクトに関するクラス
@@ -172,7 +168,6 @@ class Explosion:
             img = self.imgs[self.life // 10 % 2]
             screen.blit(img, self.rct)
 
-
 class Score:
     """
     打ち落とした爆弾の数をスコアとして表示するクラス
@@ -195,18 +190,15 @@ class Score:
         self.img = self.fonto.render(f"Score: {self.score}", True, self.color)
         screen.blit(self.img, self.rct)
 
-
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
-
     beams = [] 
     explosions = []
     score = Score()
-    
     clock = pg.time.Clock()
     tmr = 0
 
@@ -265,7 +257,6 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
-
 
 if __name__ == "__main__":
     pg.init()
