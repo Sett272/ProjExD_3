@@ -140,6 +140,29 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
+class Explosion:
+    """
+    爆発エフェクトに関するクラス
+    """
+    def __init__(self, center: tuple[int, int], life: int = 50):
+        img = pg.image.load("fig/explosion.gif")
+        # 元画像と上下左右にflip（反転）した画像の2つをリストに格納
+        self.imgs = [img, pg.transform.flip(img, True, True)]
+        self.rct = self.imgs[0].get_rect()
+        self.rct.center = center  # 爆発した爆弾の中心座標を設定
+        self.life = life  # 爆発の表示時間
+
+    def update(self, screen: pg.Surface):
+        """
+        爆発エフェクトの経過時間を減算し、画面に描画する
+        """
+        self.life -= 1
+        if self.life > 0:
+            img = self.imgs[self.life // 10 % 2]
+            screen.blit(img, self.rct)
+            return True
+        return False
+
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -154,6 +177,7 @@ def main():
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
 
     beam = None  # ゲーム初期化時にはビームは存在しない
+    explosions: list[Explosion] = []
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -178,6 +202,7 @@ def main():
                 if beam.rct.colliderect(bomb.rct):  # ビームで爆弾を撃ち落としたら
                     bird.change_img(6, screen)
                     pg.display.update()
+                    explosions.append(Explosion(bomb.rct.center))
                     beam = None
                     bombs[i] = None
         bombs = [bomb for bomb in bombs if bomb is not None]
@@ -188,6 +213,8 @@ def main():
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
+
+        explosions = [exp for exp in explosions if exp.update(screen)]
         pg.display.update()
         tmr += 1
         clock.tick(50)
